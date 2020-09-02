@@ -11,13 +11,14 @@
 
             setInterval(mainloop, 1000 / 50);
         } // end func
+        
 
         //player vars
         var playerXpos = 50;
         var playerYpos = 50;
         const playerSIZE = 50;
-        var playerXspeed = 0;
-        var playerYspeed = 0;
+        var playerXspeed = 1;
+        var playerYspeed = 1;
         
         var player = new Image();
         player.src = 'images/player1.png';
@@ -25,7 +26,18 @@
         function mainloop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black'); // bg
             drawImgs(player,playerXpos,playerYpos,playerSIZE,playerSIZE); // player
+         
+            playerMove();
         } // end func
+        
+        function playerMove() {
+            playerXpos += playerXspeed; // x move
+            playerYpos += playerYspeed; // y move
+        }
+        
+        
+        
+        
 
         function colorRect(x, y, w, h, c) {
             canvasContext.fillStyle = c;
