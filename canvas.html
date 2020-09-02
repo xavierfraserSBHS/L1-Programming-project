@@ -23,8 +23,11 @@
         var player = new Image();
         player.src = 'images/player1.png';
         
+        var bg = new Image();
+        bg.src = 'images/download.png';
+        
         function mainloop() {
-            colorRect(0, 0, canvas.width, canvas.height, 'black'); // bg
+            drawImgs(bg, 0, 0, canvas.width, canvas.height); // bg
             drawImgs(player,playerXpos,playerYpos,playerSIZE,playerSIZE); // player
          
             playerMove();
