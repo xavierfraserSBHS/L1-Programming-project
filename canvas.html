@@ -16,7 +16,7 @@
         } // end func
 
         //player vars
-        var playerXpos = 50;
+        var playerXpos = 350;
         var playerYpos = 50;
         const playerSIZE = 30;
         var playerXspeed = 2;
@@ -33,17 +33,21 @@
         const RIGHT_KEY = 39;
         const DOWN_KEY = 40;
 
+        var blockXpos = 500;
+        var blockYpos = 450;
+        var blockSIZE = 200;
+
         //  player import
         var player = new Image();
         player.src = 'images/player1.png';
 
-        // background import
-        var bg = new Image();
-        bg.src = 'images/download.png';
+        var block = new Image();
+        block.src = 'images/canvas2.png';
 
         function mainloop() {
-            drawImgs(bg, 0, 0, canvas.width, canvas.height); // bg
+            colorRect(0, 0, canvas.width, canvas.height, 'black'); // bg
             drawImgs(player, playerXpos, playerYpos, playerSIZE, playerSIZE); // player
+            drawImgs(block, blockXpos, blockYpos, blockSIZE, blockSIZE); // block
 
             playerMove();
         } // end func
@@ -81,17 +85,40 @@
         function playerMove() {
             if (rightKeyPressed) { // rightKeyPressed true
                 playerXpos += playerXspeed;
+                if (collision()) {
+                    playerXpos -= playerXspeed;
+                }
+
             }
             if (leftKeyPressed) { // leftKeyPressed true
                 playerXpos -= playerXspeed;
+                if (collision()) {
+                    playerXpos += playerXspeed;
+                }
+
+
             }
             if (upKeyPressed) { // rightKeyPressed true
                 playerYpos -= playerYspeed;
+                if (collision()) {
+                    playerYpos += playerYspeed;
+                }
+
+
             }
             if (downKeyPressed) { // rightKeyPressed true
                 playerYpos += playerYspeed;
+                if (collision()) {
+                    playerYpos -= playerYspeed;
+                }
+
             }
         } // end func
+
+        function collision() {
+            return playerXpos + playerSIZE > blockXpos && playerXpos < blockXpos + blockSIZE && playerYpos + playerSIZE > blockYpos && playerYpos < blockYpos + blockSIZE
+
+        }
 
         function colorRect(x, y, w, h, c) {
             canvasContext.fillStyle = c;
