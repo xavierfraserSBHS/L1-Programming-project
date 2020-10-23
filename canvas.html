@@ -1,7 +1,7 @@
 <!doctype html>
 
 <body>
-    <canvas id="gameCanvas" width="1000" height="900"></canvas>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
     <script>
         var canvas, canvasContext;
 
@@ -9,17 +9,22 @@
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
 
+            for (var i = 0; i < 101; i++) {
+                makeBlocks();
+            }
+            deleteBlocks();
+
             document.addEventListener('keydown', keyPressed);
             document.addEventListener('keyup', keyReleased);
 
             setInterval(mainloop, 1000 / 50);
         } // end func
 
-        //player vars
-        var playerXpos = 350;
-        var playerYpos = 50;
-        const playerSIZE = 30;
-        var playerXspeed = 2;
+        // player vars
+        var playerXpos = 490;
+        var playerYpos = 415;
+        const playerSIZE = 20;
+        var playerXspeed = 3;
         var playerYspeed = 2;
 
         // key vars
@@ -28,28 +33,44 @@
         var upKeyPressed = false;
         var downKeyPressed = false;
 
+        // key consts
         const LEFT_KEY = 37;
         const UP_KEY = 38;
         const RIGHT_KEY = 39;
         const DOWN_KEY = 40;
 
-        var blockXpos = 500;
-        var blockYpos = 450;
-        var blockSIZE = 200;
+        // block vars
+        var blockXpos = 0;
+        var blockYpos = 0;
+        var blockSIZE = 100;
+
+        var blocks = [];
 
         //  player import
         var player = new Image();
         player.src = 'images/player1.png';
 
-        var block = new Image();
-        block.src = 'images/canvas2.png';
+        var settingUp = true;
 
+        var userName = '';
+        
+        while(userName == '' || userName == null){
+            userName = prompt('what is your name?');
+        }
+      
         function mainloop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black'); // bg
+
+            if (settingUp) {
+                playerYpos = canvas.height / 10 + playerSIZE * 2;
+                settingUp = false;
+            }
+
             drawImgs(player, playerXpos, playerYpos, playerSIZE, playerSIZE); // player
-            drawImgs(block, blockXpos, blockYpos, blockSIZE, blockSIZE); // block
+            //colorRect(blockXpos, blockYpos, blockSIZE, blockSIZE); // block
 
             playerMove();
+            drawBlocks();
         } // end func
 
         function keyPressed(evt) {
@@ -84,41 +105,114 @@
 
         function playerMove() {
             if (rightKeyPressed) { // rightKeyPressed true
-                playerXpos += playerXspeed;
-                if (collision()) {
+                collision();
+                if (hit) {
+                    playerXpos += playerXspeed;
+                    hit = false;
+                    console.log(playerXspeed)
+                } else {
                     playerXpos -= playerXspeed;
-                }
 
+                }
             }
             if (leftKeyPressed) { // leftKeyPressed true
-                playerXpos -= playerXspeed;
-                if (collision()) {
+                collision();
+                if (hit) {
+                    playerXpos -= playerXspeed;
+                    hit = false;
+                    console.log(playerXspeed)
+                } else {
                     playerXpos += playerXspeed;
+
                 }
-
-
             }
-            if (upKeyPressed) { // rightKeyPressed true
-                playerYpos -= playerYspeed;
-                if (collision()) {
+            if (upKeyPressed) { // upKeyPressed true
+                collision();
+                if (hit) {
+                    playerYpos += playerYspeed;
+                    hit = false;
+                } else {
+                    playerYpos -= playerYspeed
+                }
+            }
+            if (downKeyPressed) { // downKeyPressed true
+                collision();
+                if (hit) {
+                    playerYpos -= playerYspeed;
+                    hit = false;
+                } else {
                     playerYpos += playerYspeed;
                 }
-
-
             }
-            if (downKeyPressed) { // rightKeyPressed true
-                playerYpos += playerYspeed;
-                if (collision()) {
-                    playerYpos -= playerYspeed;
-                }
 
-            }
         } // end func
 
-        function collision() {
-            return playerXpos + playerSIZE > blockXpos && playerXpos < blockXpos + blockSIZE && playerYpos + playerSIZE > blockYpos && playerYpos < blockYpos + blockSIZE
+        var blockCols = 0;
+        var blockCount = 0;
 
+        function makeBlocks() {
+            var blockWidth = canvas.width / 10;
+            var blockHeight = canvas.height / 20;
+            var blockXpos = blockCount % 10 * blockWidth;
+            var blockYpos = blockCols * blockHeight * 2;
+
+            if (blockCount % 10 == 0 && blockCount != 0) {
+                blockCols++;
+            }
+            blockCount++;
+
+            var block = {
+                blockXpos: blockXpos,
+                blockYpos: blockYpos,
+                blockWidth: blockWidth,
+                blockHeight: blockHeight
+            }
+
+            blocks.push(block);
+
+        } // end func
+
+        function drawBlocks() {
+            blocks.forEach(function(block, i, array) {
+                colorRect(block.blockXpos, block.blockYpos, block.blockWidth, block.blockHeight, 'blue');
+            });
         }
+
+            var makeGaps =  [];
+            var rowsCount = 0;
+        function deleteBlocks() {
+            for (var i = 0; i < blocks.length; i++) {
+                      
+                if(i%5 == 0 && i != 0){
+                    var randCheck = Math.floor(Math.random() * 7) + 1;
+                    makeGaps.push(randCheck + (6 * rowsCount));
+                    console.log(makeGaps + ' : ' + randCheck + ' : ' + rowsCount)
+                rowsCount++;
+                } else if(i == 0) {
+                    makeGaps.push(3);   
+                }
+            }
+            for(var i = 0; i < makeGaps.length; i++){
+                delete blocks[makeGaps[i]];
+            }
+            
+        }
+        var hit = false;
+
+        function collision() {
+            blocks.forEach(function(block, i, array) {
+
+                if (playerXpos + playerSIZE >= block.blockXpos && playerXpos <= block.blockXpos + block.blockWidth && playerYpos + playerSIZE >= block.blockYpos && playerYpos <= block.blockYpos + block.blockHeight) {
+                    hit = true;
+                    if (hit && playerYpos + playerSIZE > block.blockYpos) {
+                        playerYpos -= playerYspeed * 2;
+                    }
+                }
+
+
+            });
+        }
+        // end func
 
         function colorRect(x, y, w, h, c) {
             canvasContext.fillStyle = c;
